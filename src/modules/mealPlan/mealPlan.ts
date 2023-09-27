@@ -1,4 +1,4 @@
-import {Meal} from "@modules/meal/meal";
+import {Meal} from "../meal/meal";
 
 interface IPlannedMeal  {
   hasBeenMade: boolean
@@ -6,7 +6,7 @@ interface IPlannedMeal  {
 }
 
 export class MealPlan {
-  constructor(
+  private constructor(
     public startDate: Date,
     public endDate: Date,
     public meals: IPlannedMeal[]

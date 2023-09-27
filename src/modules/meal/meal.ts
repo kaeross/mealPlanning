@@ -1,4 +1,4 @@
-import {Ingredient} from "@modules/ingredient/ingredient";
+import {Ingredient} from "../ingredient/ingredient";
 
 interface IQuantity {
     value: number
