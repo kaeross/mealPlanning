@@ -1,6 +1,6 @@
-import {Ingredient} from "@modules/ingredient/ingredient";
+import {Ingredient} from "../ingredient/ingredient";
 import {describe, expect, test} from "bun:test";
-import {Meal} from "./meal";
+import {Meal} from ".";
 
 describe('Meal', () => {
   test('It should create a new meal without any ingredients', () => {

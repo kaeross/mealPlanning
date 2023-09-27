@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test";
-import {User} from "@modules/user";
+import {User} from ".";
 
 describe('user', () => {
   test('creates a new user', () => {

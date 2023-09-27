@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test";
-import {Ingredient} from "./ingredient";
+import {Ingredient} from ".";
 
 describe('Ingredient', () => {
   test('Creates a carrot', () => {

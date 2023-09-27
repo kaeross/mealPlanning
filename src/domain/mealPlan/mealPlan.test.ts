@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test";
-import {MealPlan} from "./mealPlan";
-import {Meal} from "@modules/meal";
+import {MealPlan} from ".";
+import {Meal} from "@domain/meal";
 
 describe('MealPlan', () => {
   test('It should create a new meal plan without any meals', () => {
