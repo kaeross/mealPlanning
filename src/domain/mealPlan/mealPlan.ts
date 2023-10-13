@@ -1,4 +1,4 @@
-import {Meal} from "../meal/meal";
+import {Meal} from "@domain/meal/meal";
 
 interface IPlannedMeal  {
   hasBeenMade: boolean

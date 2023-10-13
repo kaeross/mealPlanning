@@ -1,4 +1,4 @@
-import {Ingredient} from "@domain/ingredient";
+import {Ingredient} from "@domain/ingredient/ingredient";
 import {Context} from "elysia";
 
 export const createIngredientHandler = (context: Context) => {

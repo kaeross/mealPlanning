@@ -1,5 +1,7 @@
 import {Ingredient} from "../ingredient/ingredient";
 
+const mealStore = [];
+
 interface IQuantity {
     value: number
     unit: string
@@ -23,5 +25,7 @@ export class Meal {
 
   static create(name: string, ingredients: IIngredientsWithQuantity[] = []) {
     return new Meal(name, ingredients);
-  } 
+  }
+
+
 }
