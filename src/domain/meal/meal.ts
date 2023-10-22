@@ -1,19 +1,20 @@
+import {randomUUID} from "crypto";
 import {Ingredient} from "../ingredient/ingredient";
 
-const mealStore = [];
+export const mealStore: Meal[] = [];
 
-interface IQuantity {
-    value: number
-    unit: string
-  }
+export interface IQuantity {
+  value: number
+  unit: string
+}
 
-interface IIngredientsWithQuantity {
+export interface IIngredientsWithQuantity {
   quantity: IQuantity
   ingredient: Ingredient
 }
 
 export class Meal {
-  constructor(public name: string, public ingredients: IIngredientsWithQuantity[]) {}
+  constructor(public name: string, public ingredients: IIngredientsWithQuantity[], public id: string) {}
 
   listIngredients(): IIngredientsWithQuantity[] {
     return this.ingredients;
@@ -24,8 +25,22 @@ export class Meal {
   }
 
   static create(name: string, ingredients: IIngredientsWithQuantity[] = []) {
-    return new Meal(name, ingredients);
+    const id = randomUUID();
+    return new Meal(name, ingredients, id);
   }
 
+  save() {
+    mealStore.push(this)
+  }
 
+  stringify() {
+    return {
+      id: this.id,
+      name: this.name,
+      ingredients: this.ingredients.map(({ingredient, quantity}) => ({
+        quantity,
+        ingredient: ingredient.stringify()
+      }))
+    }
+  }
 }
