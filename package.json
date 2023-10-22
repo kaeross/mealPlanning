@@ -2,7 +2,6 @@
   "name": "mealplanning",
   "module": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch index.ts"
   },
   "type": "module",

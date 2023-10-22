@@ -19,7 +19,8 @@
       "bun-types" // add Bun global
     ],
     "paths": {
-      "@domain/*": ["./src/domain/*"]
+      "@domain/*": ["./src/domain/*"],
+      "@interfaces/*": ["./src/interfaces/*"]
     }
   }
 }

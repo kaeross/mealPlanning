@@ -1,28 +1,48 @@
 import { Elysia, t } from "elysia";
-import {createIngredientHandler} from "./src/interfaces/ingredients/create";
-import {listIngredientHandler} from "./src/interfaces/ingredients/list";
-import {createMealHandler} from "./src/interfaces/meal/create";
-import {listMealHandler} from "./src/interfaces/meal/list";
+import {IngredientRepository} from "@domain/ingredient/repository";
+import {IngredientService} from "@domain/ingredient/service";
+import {IngredientInterface} from "@interfaces/ingredientInterface";
+import {MealRepository} from "@domain/meal/repository";
+import {MealService} from "@domain/meal/service";
+import {MealInterface} from "@interfaces/mealInterface";
+
+const ingredientRepository = new IngredientRepository()
+const ingredientService = new IngredientService(ingredientRepository)
+const ingredientInterface = new IngredientInterface(ingredientService)
+
+const mealRepository = new MealRepository()
+const mealService = new MealService(mealRepository)
+const mealInterface = new MealInterface(mealService)
 
 const app = new Elysia()
+  .decorate('ingredientInterface', ingredientInterface)
+  .decorate('mealInterface', mealInterface)
   .get("/", () => "Welcome to elysia")
-  .get("/ingredients", listIngredientHandler)
-  .post("/ingredients", createIngredientHandler, {
+  .get("/ingredients", ({ingredientInterface}) => {
+    return ingredientInterface.list()
+  } )
+  .post("/ingredients", ({ingredientInterface, body}) => {
+    return ingredientInterface.create(body)
+  }, {
     body: t.Object({
       name: t.String()
     })
   })
-  .get("/meals", listMealHandler)
-  .post("/meals", createMealHandler, {
+  .get("/meals", ({mealInterface}) => {
+    return mealInterface.list()
+  })
+  .post("/meals", ({mealInterface, body}) => {
+    return mealInterface.create(body)
+  }, {
     body: t.Object({
       name: t.String(),
-      ingredients: t.Optional(Object({
-        quantity: t.Object({
-          value: t.Number(),
-          unit: t.String()
-        }),
-        ingredientId: t.String() 
-      }))
+      // ingredients: t.Optional(Object({
+      //   quantity: t.Object({
+      //     value: t.Number(),
+      //     unit: t.String()
+      //   }),
+      //   ingredientId: t.String() 
+      // }))
     })
   })
   .listen(3000);
