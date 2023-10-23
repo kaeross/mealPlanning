@@ -7,10 +7,11 @@ export interface IQuantity {
 
 export interface IIngredientsWithQuantity {
   quantity: IQuantity
-  ingredient: IIngredient
+  ingredientId: string
 }
 
 export interface IMeal {
   id: string;
   name: string;
+  ingredients: IIngredientsWithQuantity[]
 }

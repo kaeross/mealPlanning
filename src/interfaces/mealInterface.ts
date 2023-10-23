@@ -8,7 +8,7 @@ export class MealInterface {
     return this.service.list()
   }
 
-  create(meal: Omit<IMeal, 'id'>) {
-    return this.service.create(meal)
+  create({name, ingredients}: Pick<IMeal, 'name'> & Partial<Pick<IMeal, 'ingredients'>>) {
+    return this.service.create({name, ingredients: ingredients ?? []})
   }
 }

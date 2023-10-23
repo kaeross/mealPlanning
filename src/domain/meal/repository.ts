@@ -27,7 +27,10 @@ export class MealRepository {
   }
 
   update(where: Partial<IMeal>, data: Partial<IMeal>) {
+    throw new Error('Not yet implemented')
   }
 
-  delete() {}
+  delete() {
+    throw new Error('Not yet implemented')
+  }
 }

@@ -6,6 +6,8 @@ import {MealRepository} from "@domain/meal/repository";
 import {MealService} from "@domain/meal/service";
 import {MealInterface} from "@interfaces/mealInterface";
 
+// Initialise dependencies
+
 const ingredientRepository = new IngredientRepository()
 const ingredientService = new IngredientService(ingredientRepository)
 const ingredientInterface = new IngredientInterface(ingredientService)
@@ -13,6 +15,8 @@ const ingredientInterface = new IngredientInterface(ingredientService)
 const mealRepository = new MealRepository()
 const mealService = new MealService(mealRepository)
 const mealInterface = new MealInterface(mealService)
+
+// Create routes
 
 const app = new Elysia()
   .decorate('ingredientInterface', ingredientInterface)
@@ -36,13 +40,13 @@ const app = new Elysia()
   }, {
     body: t.Object({
       name: t.String(),
-      // ingredients: t.Optional(Object({
-      //   quantity: t.Object({
-      //     value: t.Number(),
-      //     unit: t.String()
-      //   }),
-      //   ingredientId: t.String() 
-      // }))
+      ingredients: t.Optional(t.Array(t.Object({
+        quantity: t.Object({
+          value: t.Number(),
+          unit: t.String()
+        }),
+        ingredientId: t.String() 
+      })))
     })
   })
   .listen(3000);
