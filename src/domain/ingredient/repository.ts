@@ -13,8 +13,8 @@ export class IngredientRepository {
   async create(ingredient: Omit<IIngredient, 'id'>): Promise<IIngredient> {
     const id = randomUUID();
     const created = {...ingredient, id};
-    await this.db.create(this.modelName, created)
-    return created;
+    const node = await this.db.create<IIngredient>(this.modelName, created)
+    return node.properties();
   }
 
   createMany(ingredients: Omit<IIngredient, 'id'>[]): Promise<IIngredient[]> {
