@@ -1,6 +1,6 @@
 import {randomUUID} from "crypto";
 import {IIngredient} from "./types";
-import Neode, {Builder} from "neode";
+import Neode from "neode";
 import {QueryResult} from "neo4j-driver";
 
 export const ingredientsStore: IIngredient[] = [];
@@ -10,22 +10,22 @@ export class IngredientRepository {
 
   constructor(private db: Neode) {}
 
-  async create(ingredient: Omit<IIngredient, 'id'>) {
+  async create(ingredient: Omit<IIngredient, 'id'>): Promise<IIngredient> {
     const id = randomUUID();
     const created = {...ingredient, id};
     await this.db.create(this.modelName, created)
     return created;
   }
 
-  createMany(ingredients: Omit<IIngredient, 'id'>[]) {
-    return ingredients.map(this.create);
+  createMany(ingredients: Omit<IIngredient, 'id'>[]): Promise<IIngredient[]> {
+    return Promise.all(ingredients.map(this.create));
   }
 
   find({name, id}: Partial<IIngredient>) {
     return ingredientsStore.find(i => i.id === id || i.name === name);
   }
 
-  async findMany(ids?: string[]) {
+  async findMany(ids?: string[]): Promise<IIngredient[]> {
       if (!ids) {
         return this.findAll()
       }
