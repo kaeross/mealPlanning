@@ -7,7 +7,7 @@ export class MealService {
     return this.repository.findMany()
   }
 
-  create(meal: Omit<IMeal, 'id'>) {
+  create(meal: IMeal) {
     return this.repository.create(meal);
   }
 }

@@ -10,8 +10,11 @@ export interface IIngredientsWithQuantity {
   ingredientId: string
 }
 
-export interface IMeal {
+export interface IMealModel {
   id: string;
   name: string;
-  ingredients: IIngredientsWithQuantity[]
+}
+
+export interface IMeal extends IMealModel {
+  ingredients: Array<IIngredientsWithQuantity>
 }
