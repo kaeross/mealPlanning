@@ -23,9 +23,14 @@ const app = new Elysia()
   .decorate('ingredientInterface', ingredientInterface)
   .decorate('mealInterface', mealInterface)
   .get("/", () => "Welcome to elysia")
-  .get("/ingredients", async ({ingredientInterface}) => {
-    return ingredientInterface.list()
-  } )
+  .get("/ingredients", async ({ingredientInterface, query}) => {
+    const ids = query.ids ? JSON.parse(query.ids) : undefined;
+    return ingredientInterface.list(ids)
+  }, {
+    query: t.Object({
+      ids: t.Optional(t.String())
+    })
+  })
   .post("/ingredients", async ({ingredientInterface, body}) => {
     return ingredientInterface.create(body)
   }, {

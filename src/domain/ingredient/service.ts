@@ -3,8 +3,8 @@ import {IIngredient} from "./types";
 
 export class IngredientService {
   constructor(private repository: IngredientRepository) {}
-  async list() {
-    return this.repository.findMany()
+  async list(ids?: string[]) {
+    return this.repository.findMany(ids)
   }
 
   async create(ingredient: Omit<IIngredient, 'id'>) {
