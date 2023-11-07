@@ -1,8 +1,8 @@
-import {Meal} from "@domain/meal/meal";
+import {IMeal} from "@domain/meal/types";
 
 interface IPlannedMeal  {
   hasBeenMade: boolean
-  meal: Meal
+  meal: IMeal
 }
 
 export class MealPlan {
@@ -16,11 +16,11 @@ export class MealPlan {
     return this.meals;
   }
 
-  addMeal(meal: Meal) {
+  addMeal(meal: IMeal) {
     this.meals.push({hasBeenMade: false, meal})
   }
 
-  static create(startDate: Date, endDate: Date, meals: Meal[] = []) {
+  static create(startDate: Date, endDate: Date, meals: IMeal[] = []) {
     return new MealPlan(startDate, endDate, meals.map(meal => ({hasBeenMade: false, meal})))
   }
 }

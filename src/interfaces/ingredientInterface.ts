@@ -8,7 +8,7 @@ export class IngredientInterface {
     return this.service.list()
   }
 
-  create(ingredient: Omit<IIngredient, 'id'>) {
+  async create(ingredient: Omit<IIngredient, 'id'>) {
     return this.service.create(ingredient)
   }
 }

@@ -1,13 +1,17 @@
 import {randomUUID} from "crypto";
 import {IIngredient} from "./types";
+import Neode from "neode";
+import {IngredientModel} from "./model";
 
 export const ingredientsStore: IIngredient[] = [];
 
 export class IngredientRepository {
-  create(ingredient: Omit<IIngredient, 'id'>) {
+  constructor(private db: Neode) {}
+
+  async create(ingredient: Omit<IIngredient, 'id'>) {
     const id = randomUUID();
     const created = {...ingredient, id};
-    ingredientsStore.push(created);
+    await this.db.merge('Ingredient', created)
     return created;
   }
 

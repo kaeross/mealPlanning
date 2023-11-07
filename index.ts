@@ -5,10 +5,11 @@ import {IngredientInterface} from "@interfaces/ingredientInterface";
 import {MealRepository} from "@domain/meal/repository";
 import {MealService} from "@domain/meal/service";
 import {MealInterface} from "@interfaces/mealInterface";
+import {db} from "@infra/database"
 
 // Initialise dependencies
 
-const ingredientRepository = new IngredientRepository()
+const ingredientRepository = new IngredientRepository(db)
 const ingredientService = new IngredientService(ingredientRepository)
 const ingredientInterface = new IngredientInterface(ingredientService)
 
@@ -22,20 +23,20 @@ const app = new Elysia()
   .decorate('ingredientInterface', ingredientInterface)
   .decorate('mealInterface', mealInterface)
   .get("/", () => "Welcome to elysia")
-  .get("/ingredients", ({ingredientInterface}) => {
+  .get("/ingredients", async ({ingredientInterface}) => {
     return ingredientInterface.list()
   } )
-  .post("/ingredients", ({ingredientInterface, body}) => {
+  .post("/ingredients", async ({ingredientInterface, body}) => {
     return ingredientInterface.create(body)
   }, {
     body: t.Object({
       name: t.String()
     })
   })
-  .get("/meals", ({mealInterface}) => {
+  .get("/meals", async ({mealInterface}) => {
     return mealInterface.list()
   })
-  .post("/meals", ({mealInterface, body}) => {
+  .post("/meals",async ({mealInterface, body}) => {
     return mealInterface.create(body)
   }, {
     body: t.Object({
@@ -49,7 +50,11 @@ const app = new Elysia()
       })))
     })
   })
-  .listen(3000);
+  .listen(3000)
+  .onStop(() => {
+    console.log('disconnecting')
+    db.close()
+  });
 
 
 console.log(
