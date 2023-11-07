@@ -45,7 +45,7 @@ export class IngredientRepository {
   async findAll() {
     const all = await this.db.all(this.modelName);
 
-    return all.toJson()
+    return all.map(n => n.properties())
   }
 
   update(where: Partial<IIngredient>, data: Partial<IIngredient>) {
