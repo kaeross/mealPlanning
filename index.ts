@@ -13,7 +13,7 @@ const ingredientRepository = new IngredientRepository(db)
 const ingredientService = new IngredientService(ingredientRepository)
 const ingredientInterface = new IngredientInterface(ingredientService)
 
-const mealRepository = new MealRepository()
+const mealRepository = new MealRepository(db, ingredientRepository)
 const mealService = new MealService(mealRepository)
 const mealInterface = new MealInterface(mealService)
 

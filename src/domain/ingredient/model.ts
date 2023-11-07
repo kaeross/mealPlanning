@@ -8,5 +8,14 @@ export const IngredientModel: SchemaObject = {
   name: {
     type: 'string',
     unique: true
+  },
+  quantity: {
+    type: 'relationship',
+    relationship: 'QUANTITY',
+    direction: 'in',
+    properties: {
+      value: 'number',
+      unit: 'string'
+    }
   }
 }
