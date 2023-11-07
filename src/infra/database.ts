@@ -1,6 +1,7 @@
 
 import {IngredientModel} from '@domain/ingredient/model';
-import Neode from 'neode';
+import {MealModel} from '@domain/meal/model';
+import Neode, {Model, Relationship, RelationshipType} from 'neode';
 
 const URI = Bun.env.NEO4J_URI;
 const USER = Bun.env.NEO4J_USERNAME;
@@ -11,8 +12,8 @@ if (!URI || !USER || !PASSWORD) {
 }
 
 
-const instance = new Neode(URI, USER, PASSWORD)
-.with({Ingredient: IngredientModel});
+const instance = new Neode(URI, USER, PASSWORD);
+
 
 export const logServerInfo = async () => {
   instance.schema.install()

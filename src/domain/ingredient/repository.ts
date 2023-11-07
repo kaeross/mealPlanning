@@ -1,23 +1,26 @@
 import {randomUUID} from "crypto";
 import {IIngredient} from "./types";
-import Neode from "neode";
+import Neode, {Model} from "neode";
 import {QueryResult} from "neo4j-driver";
+import {IngredientModel} from "./model";
 
 export const ingredientsStore: IIngredient[] = [];
 
 export class IngredientRepository {
-  private modelName = 'Ingredient';
+  model: Model<IIngredient>;
 
-  constructor(private db: Neode) {}
+  constructor(private db: Neode) {
+    this.model = db.model<IIngredient>('Ingredient', IngredientModel);
+  }
 
-  async create(ingredient: Omit<IIngredient, 'id'>): Promise<IIngredient> {
+  async create(ingredient: Omit<IIngredient, 'id'>) {
     const id = randomUUID();
     const created = {...ingredient, id};
-    const node = await this.db.create<IIngredient>(this.modelName, created)
+    const node = await this.model.create(created)
     return node.properties();
   }
 
-  createMany(ingredients: Omit<IIngredient, 'id'>[]): Promise<IIngredient[]> {
+  createMany(ingredients: Omit<IIngredient, 'id'>[]) {
     return Promise.all(ingredients.map(this.create));
   }
 
@@ -25,16 +28,14 @@ export class IngredientRepository {
     return ingredientsStore.find(i => i.id === id || i.name === name);
   }
 
-  async findMany(ids?: string[]): Promise<IIngredient[]> {
+  async findMany(ids?: string[]) {
       if (!ids) {
         return this.findAll()
       }
       const builder = this.db.query();
-      const model = this.db.model(this.modelName);
 
-   
        const nodes = await builder
-        .match('n', model)
+        .match('n', this.model)
         .where(`n.id in ${JSON.stringify(ids)}`)
         .return('n')
         .execute('READ')
@@ -43,7 +44,7 @@ export class IngredientRepository {
   }
 
   async findAll() {
-    const all = await this.db.all(this.modelName);
+    const all = await this.model.all();
 
     return all.map(n => n.properties())
   }
@@ -53,7 +54,7 @@ export class IngredientRepository {
 
   delete() {}
 
-  formatRecords(records: QueryResult["records"]) {
+  formatRecords(records: QueryResult["records"]): IIngredient[] {
     return records.map(record => record.map(r => r.properties)[0]);
   }
 }
