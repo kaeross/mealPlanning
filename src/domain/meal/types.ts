@@ -5,9 +5,9 @@ export interface IQuantity {
   unit: string
 }
 
-export interface IIngredientsWithQuantity {
-  quantity: IQuantity
-  ingredientId: string
+export interface IIngredientsWithQuantity extends Partial<IIngredient> {
+  id: string;
+  quantity: IQuantity;
 }
 
 export type MealCreateBody = Omit<IMeal, 'id'>

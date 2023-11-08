@@ -11,7 +11,7 @@ export const IngredientModel: SchemaObject = {
   },
   quantity: {
     type: 'relationship',
-    relationship: 'QUANTITY',
+    relationship: 'HAS_QUANTITY',
     direction: 'in',
     properties: {
       value: 'number',

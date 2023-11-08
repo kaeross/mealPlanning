@@ -11,7 +11,7 @@ export const MealModel: SchemaObject = {
   },
   quantity: {
     type: 'relationship',
-    relationship: 'QUANTITY',
+    relationship: 'HAS_QUANTITY',
     direction: 'out',
     properties: {
       value: 'number',

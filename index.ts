@@ -56,7 +56,7 @@ const app = new Elysia()
           value: t.Number(),
           unit: t.String()
         }),
-        ingredientId: t.String() 
+        id: t.String() 
       }))
     })
   })
