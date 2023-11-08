@@ -38,21 +38,26 @@ const app = new Elysia()
       name: t.String()
     })
   })
-  .get("/meals", async ({mealInterface}) => {
-    return mealInterface.list()
+  .get("/meals", async ({mealInterface, query}) => {
+    const ids = query.ids ? JSON.parse(query.ids) : undefined;
+    return mealInterface.list(ids)
+  }, {
+    query: t.Object({
+      ids: t.Optional(t.String())
+    })
   })
   .post("/meals",async ({mealInterface, body}) => {
     return mealInterface.create(body)
   }, {
     body: t.Object({
       name: t.String(),
-      ingredients: t.Optional(t.Array(t.Object({
+      ingredients: t.Array(t.Object({
         quantity: t.Object({
           value: t.Number(),
           unit: t.String()
         }),
         ingredientId: t.String() 
-      })))
+      }))
     })
   })
   .listen(3000)

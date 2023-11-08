@@ -1,14 +1,15 @@
 import {MealService} from "@domain/meal/service";
-import {IMeal} from "@domain/meal/types";
+import {IIngredientsWithQuantity, MealCreateBody} from "@domain/meal/types";
 
 export class MealInterface {
   constructor(private service: MealService) {}
 
-  list() {
-    return this.service.list()
+  list(ids?: string[]) {
+    return this.service.list(ids)
   }
 
-  create({name, ingredients}: Pick<IMeal, 'name'> & Partial<Pick<IMeal, 'ingredients'>>) {
-    return this.service.create({name, ingredients: ingredients ?? []})
+  create({name, ingredients}: MealCreateBody) {
+    const emptyArray: IIngredientsWithQuantity[] = []
+    return this.service.create({name, ingredients: ingredients ?? emptyArray})
   }
 }

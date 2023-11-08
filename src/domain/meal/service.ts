@@ -1,13 +1,13 @@
 import {MealRepository} from "./repository";
-import {IMeal} from "./types";
+import {MealCreateBody} from "./types";
 
 export class MealService {
   constructor(private repository: MealRepository) {}
-  list() {
-    return this.repository.findMany()
+  list(ids?: string[]) {
+    return this.repository.findMany(ids)
   }
 
-  create(meal: IMeal) {
+  create(meal: MealCreateBody) {
     return this.repository.create(meal);
   }
 }

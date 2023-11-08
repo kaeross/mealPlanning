@@ -10,6 +10,8 @@ export interface IIngredientsWithQuantity {
   ingredientId: string
 }
 
+export type MealCreateBody = Omit<IMeal, 'id'>
+
 export interface IMealModel {
   id: string;
   name: string;

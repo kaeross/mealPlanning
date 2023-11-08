@@ -26,7 +26,7 @@ export class IngredientRepository extends Repository<IIngredient> {
   }
 
   async findMany(ids?: string[]) {
-      if (!ids) {
+      if (!ids?.length) {
         return this.findAll()
       }
 
