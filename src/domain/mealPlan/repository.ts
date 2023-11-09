@@ -40,7 +40,7 @@ export class PlanRepository extends Repository<IPlanModel, IPlan, IPlanCreateBod
   }
 
   async findHydrated(id: string) {
-    const found = await this.db.cypher('MATCH (p:Plan {id: $id})-[q:INCLUDES]-(m:Meal) RETURN m.id, m.name, q.unit, q.value', {id});
+    const found = await this.db.cypher('MATCH (p:Plan {id: $id})-[r:INCLUDES]-(m:Meal) RETURN m.id, m.name, r.consumedAt', {id});
 
     if (!found.records) {
       return null;
@@ -49,38 +49,57 @@ export class PlanRepository extends Repository<IPlanModel, IPlan, IPlanCreateBod
     return this.formatFindResult(found.records as unknown as CypherRecord[])
   } 
   
-  async findAll() {
-    const all = await this.model.all();
+  async findAll(): Promise<IPlan[]> {
+    const found = await this.db.cypher('MATCH (p:Plan)-[r:INCLUDES]-(m:Meal) RETURN p.id, m.id, m.name, r.consumedAt', {});
 
-    return all.map(n => n.properties())
+    if (!found.records) {
+      return [];
+    }
+
+    return this.formatFindManyResult(found.records as unknown as CypherRecord[])
   }
 
   async findMany(ids?: string[]) {
     if (!ids?.length) {
       return this.findAll()
     }
-    return Promise.all(ids.map((id) => this.findHydrated(id)));
+    return (await Promise.all(ids.map((id) => this.findHydrated(id)))).filter(Boolean) as IPlan[];
+  }
+
+  formatCypher(records: CypherRecord[]) {
+    const planMap = new Map<string, IPlan>();
+
+    const getFieldIndex = (fieldName: string, record: CypherRecord) => record._fieldLookup[fieldName];
+    
+    records.forEach(r => {
+      const planId = r._fields[getFieldIndex("p.id", r)] as string;
+
+      const existing = planMap.get(planId);
+
+      if (!existing) {
+        planMap.set(planId, {
+          id: planId,
+          meals: []
+        })
+      }
+
+      const newMeal = {
+        id: r._fields[getFieldIndex("m.id", r)] as string,
+        name: r._fields[getFieldIndex("m.name", r)] as string,
+        consumedAt: r._fields[getFieldIndex("r.consumedAt", r)] as string | null,
+      }
+
+      planMap.get(planId)?.meals.push(newMeal);
+    })
+    
+    return planMap;
   }
 
   formatFindResult(records: CypherRecord[]): IPlan {
-    const getFieldIndex = (fieldName: string, record: CypherRecord) => record._fieldLookup[fieldName];
-
-    
-    const mealId = records[0]._fields[getFieldIndex("m.id", records[0])] as string;
-    
-    const meals = records.map(r => {
-
-      return {
-        id: r._fields[getFieldIndex("m.id", r)] as string,
-        name: r._fields[getFieldIndex("m.name", r)] as string,
-        consumedAt: null
-      }
-    })
-    
-    return {
-      id: mealId,
-      meals
-    }
+    return this.formatCypher(records).entries().next().value
   }
-  
+
+  formatFindManyResult(records: CypherRecord[]): IPlan[] {
+    return Array.from(this.formatCypher(records).values())
+  }
 }
