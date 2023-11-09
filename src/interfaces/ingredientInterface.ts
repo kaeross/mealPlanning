@@ -1,14 +1,9 @@
 import {IngredientService} from "@domain/ingredient/service";
-import {IIngredient} from "@domain/ingredient/types";
+import {AbstractInterface} from "./abstractInterface";
+import {IIngredientModel,IngredientCreateBody} from "@domain/ingredient/types";
 
-export class IngredientInterface {
-  constructor(private service: IngredientService) {}
-
-  list(ids?: string[]) {
-    return this.service.list(ids)
-  }
-
-  async create(ingredient: Omit<IIngredient, 'id'>) {
-    return this.service.create(ingredient)
+export class IngredientInterface extends AbstractInterface<IIngredientModel, IIngredientModel, IngredientCreateBody>{
+  constructor( service: IngredientService) {
+    super(service)
   }
 }

@@ -6,6 +6,9 @@ import {MealRepository} from "@domain/meal/repository";
 import {MealService} from "@domain/meal/service";
 import {MealInterface} from "@interfaces/mealInterface";
 import {db} from "@infra/database"
+import {PlanRepository} from "@domain/mealPlan/repository";
+import {PlanService} from "@domain/mealPlan/service";
+import {PlanInterface} from "@interfaces/planInterface";
 
 // Initialise dependencies
 
@@ -16,6 +19,11 @@ const ingredientInterface = new IngredientInterface(ingredientService)
 const mealRepository = new MealRepository(db, ingredientRepository)
 const mealService = new MealService(mealRepository)
 const mealInterface = new MealInterface(mealService)
+
+
+const planRepository = new PlanRepository(db, mealRepository)
+const planService = new PlanService(planRepository)
+const planInterface = new PlanInterface(planService)
 
 // Create routes
 

@@ -1,11 +1,10 @@
 import {MealService} from "@domain/meal/service";
-import {IIngredientsWithQuantity, MealCreateBody} from "@domain/meal/types";
+import {IIngredientsWithQuantity, IMeal, IMealModel, MealCreateBody} from "@domain/meal/types";
+import {AbstractInterface} from "./abstractInterface";
 
-export class MealInterface {
-  constructor(private service: MealService) {}
-
-  async list(ids?: string[]) {
-    return this.service.list(ids)
+export class MealInterface extends AbstractInterface<IMealModel, IMeal, MealCreateBody> {
+  constructor(service: MealService) {
+    super(service)
   }
 
   async create({name, ingredients}: MealCreateBody) {
