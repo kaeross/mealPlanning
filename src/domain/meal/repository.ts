@@ -53,43 +53,63 @@ export class MealRepository extends Repository<IMealModel, IMeal, MealCreateBody
   } 
   
   async findAll() {
-    const all = await this.model.all();
+    const found = await this.db.cypher('MATCH (m:Meal)-[q:HAS_QUANTITY]-(i:Ingredient) RETURN m.id, m.name, q.unit, q.value ,i.id, i.name', {});
 
-    return all.map(n => n.properties())
+    if (!found.records) {
+      return [];
+    }
+
+    return this.formatFindManyResult(found.records as unknown as CypherRecord[])
   }
 
   async findMany(ids?: string[]) {
     if (!ids?.length) {
       return this.findAll()
     }
-    return Promise.all(ids.map((id) => this.findHydrated(id)));
+    return (await Promise.all(ids.map((id) => this.findHydrated(id)))).filter(Boolean) as IMeal[];
   }
 
-  formatFindResult(records: CypherRecord[]): IMeal {
-    const getFieldIndex = (fieldName: string, record: CypherRecord) => record._fieldLookup[fieldName];
+  formatCypher(records: CypherRecord[]) {
+    const mealMap = new Map<string, IMeal>();
 
+    const getFieldIndex = (fieldName: string, record: CypherRecord) => record._fieldLookup[fieldName];
     
-    const mealId = records[0]._fields[getFieldIndex("m.id", records[0])] as string;
-    const mealName = records[0]._fields[getFieldIndex("m.name", records[0])] as string;
-    
-    const ingredients = records.map(r => {
+    records.forEach(r => {
+      const mealId = r._fields[getFieldIndex("m.id", r)] as string;
+      const mealName = r._fields[getFieldIndex("m.name", r)] as string;
+
+      const existing = mealMap.get(mealId);
+      
       const quantity = {
         unit: r._fields[getFieldIndex("q.unit", r)] as string,
         value: r._fields[getFieldIndex("q.value", r)] as number,
       }
 
-      return {
+      if (!existing) {
+        mealMap.set(mealId, {
+          id: mealId,
+          name: mealName,
+          ingredients: []
+        })
+      }
+
+      const newIngredient = {
         id: r._fields[getFieldIndex("i.id", r)] as string,
         name: r._fields[getFieldIndex("i.name", r)] as string,
         quantity
       }
+
+      mealMap.get(mealId)?.ingredients.push(newIngredient);
     })
     
-    return {
-      id: mealId,
-      name: mealName,
-      ingredients
-    }
+    return mealMap;
   }
-  
+
+  formatFindResult(records: CypherRecord[]): IMeal {
+    return this.formatCypher(records).entries().next().value
+  }
+
+  formatFindManyResult(records: CypherRecord[]): IMeal[] {
+    return Array.from(this.formatCypher(records).values())
+  }
 }
