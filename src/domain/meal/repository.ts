@@ -1,36 +1,115 @@
 import {randomUUID} from "crypto";
-import { IMeal} from "./types";
+import { IMeal, IMealModel, MealCreateBody} from "./types";
+import Neode from "neode";
+import {MealModel} from "./model";
+import {IngredientRepository} from "@domain/ingredient/repository";
+import {Repository} from "@domain/repository";
+import {CypherRecord} from "@domain/types";
 
-export const mealStore: IMeal[] = [];
+export class MealRepository extends Repository<IMealModel, IMeal, MealCreateBody> {
+  constructor(db: Neode, private ingredientRepo: IngredientRepository) {
+    super(db, 'Meal', MealModel);
+  }
 
-export class MealRepository {
-  create(meal: Omit<IMeal, 'id'>) {
+  async create({name, ingredients}: MealCreateBody) {
     const id = randomUUID();
-    const created = {...meal, id};
-    mealStore.push(created);
-    return created;
-  }
+    const toCreate = {id, name};
+    const created = await this.model.create(toCreate);
 
-  createMany(meals: Omit<IMeal, 'id'>[]) {
-    return meals.map(this.create);
-  }
+    try {
+    for(const ingredient of ingredients) {
+      const i = await this.ingredientRepo.find(ingredient.id);
 
-  find({name, id}: Partial<IMeal>) {
-    return mealStore.find(m => m.id === id || m.name === name);
-  }
+      await created.relateTo(i, 'quantity', ingredient.quantity, true);
+    }} catch (e) {
+      console.error(e);
 
-  findMany(ids?: string[]) {
-    if (!ids) {
-      return mealStore;
+      await created.delete()
     }
-    return mealStore.filter(m => ids.includes(m.id));
+
+    const createdMeal = created.properties();
+    
+    const found = await this.findHydrated(createdMeal.id);
+
+    if(!found) {
+      throw new Error('Could not find created meal')
+    }
+
+    return found;
   }
 
-  update(where: Partial<IMeal>, data: Partial<IMeal>) {
-    throw new Error('Not yet implemented')
+  find(id: string) {
+    return this.model.find(id)
   }
 
-  delete() {
-    throw new Error('Not yet implemented')
+  async findHydrated(id: string): Promise<IMeal | null> {
+    const found = await this.db.cypher('MATCH (m:Meal {id: $id})-[q:HAS_QUANTITY]-(i:Ingredient) RETURN m.id, m.name, q.unit, q.value ,i.id, i.name', {id});
+
+    if (!found.records) {
+      return null;
+    }
+
+    return this.formatFindResult(found.records as unknown as CypherRecord[])
+  } 
+  
+  async findAll() {
+    const found = await this.db.cypher('MATCH (m:Meal)-[q:HAS_QUANTITY]-(i:Ingredient) RETURN m.id, m.name, q.unit, q.value ,i.id, i.name', {});
+
+    if (!found.records) {
+      return [];
+    }
+
+    return this.formatFindManyResult(found.records as unknown as CypherRecord[])
+  }
+
+  async findMany(ids?: string[]) {
+    if (!ids?.length) {
+      return this.findAll()
+    }
+    return (await Promise.all(ids.map((id) => this.findHydrated(id)))).filter(Boolean) as IMeal[];
+  }
+
+  formatCypher(records: CypherRecord[]) {
+    const mealMap = new Map<string, IMeal>();
+
+    const getFieldIndex = (fieldName: string, record: CypherRecord) => record._fieldLookup[fieldName];
+    
+    records.forEach(r => {
+      const mealId = r._fields[getFieldIndex("m.id", r)] as string;
+      const mealName = r._fields[getFieldIndex("m.name", r)] as string;
+
+      const existing = mealMap.get(mealId);
+      
+      const quantity = {
+        unit: r._fields[getFieldIndex("q.unit", r)] as string,
+        value: r._fields[getFieldIndex("q.value", r)] as number,
+      }
+
+      if (!existing) {
+        mealMap.set(mealId, {
+          id: mealId,
+          name: mealName,
+          ingredients: []
+        })
+      }
+
+      const newIngredient = {
+        id: r._fields[getFieldIndex("i.id", r)] as string,
+        name: r._fields[getFieldIndex("i.name", r)] as string,
+        quantity
+      }
+
+      mealMap.get(mealId)?.ingredients.push(newIngredient);
+    })
+    
+    return mealMap;
+  }
+
+  formatFindResult(records: CypherRecord[]): IMeal {
+    return this.formatCypher(records).entries().next().value
+  }
+
+  formatFindManyResult(records: CypherRecord[]): IMeal[] {
+    return Array.from(this.formatCypher(records).values())
   }
 }

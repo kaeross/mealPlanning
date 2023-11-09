@@ -1,33 +1,47 @@
 import {randomUUID} from "crypto";
-import {IIngredient} from "./types";
+import { IngredientCreateBody, IIngredientModel} from "./types";
+import Neode from "neode";
+import {QueryResult} from "neo4j-driver";
+import {IngredientModel} from "./model";
+import {Repository} from "@domain/repository";
 
-export const ingredientsStore: IIngredient[] = [];
+export class IngredientRepository extends Repository<IIngredientModel, IIngredientModel, IngredientCreateBody> {
+  constructor(db: Neode) {
+    super(db, 'Ingredient', IngredientModel);
+  }
 
-export class IngredientRepository {
-  create(ingredient: Omit<IIngredient, 'id'>) {
+  async create(ingredient: IngredientCreateBody) {
     const id = randomUUID();
-    const created = {...ingredient, id};
-    ingredientsStore.push(created);
-    return created;
+    const toCreate = {...ingredient, id};
+    const created = await this.model.create(toCreate)
+    return created.properties();
   }
 
-  createMany(ingredients: Omit<IIngredient, 'id'>[]) {
-    return ingredients.map(this.create);
+  createMany(ingredients: IngredientCreateBody[]) {
+    return Promise.all(ingredients.map(this.create));
   }
 
-  find({name, id}: Partial<IIngredient>) {
-    return ingredientsStore.find(i => i.id === id || i.name === name);
+  find(id: string) {
+    return this.model.find(id)
   }
 
-  findMany(ids?: string[]) {
-    if (!ids) {
-      return ingredientsStore;
-    }
-    return ingredientsStore.filter(i => ids.includes(i.id));
+  async findMany(ids?: string[]) {
+      if (!ids?.length) {
+        return this.findAll()
+      }
+
+      const nodes = await this.queryManyByIds(ids)
+
+      return this.formatRecords(nodes.records as any)
   }
 
-  update(where: Partial<IIngredient>, data: Partial<IIngredient>) {
+  async findAll() {
+    const all = await this.model.all();
+
+    return all.map(n => n.properties())
   }
 
-  delete() {}
+  formatRecords(records: QueryResult["records"]): IIngredientModel[] {
+    return records.map(record => record.map(r => r.properties)[0]);
+  }
 }

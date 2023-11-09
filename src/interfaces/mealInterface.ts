@@ -1,14 +1,14 @@
 import {MealService} from "@domain/meal/service";
-import {IMeal} from "@domain/meal/types";
+import {IIngredientsWithQuantity, IMeal, IMealModel, MealCreateBody} from "@domain/meal/types";
+import {AbstractInterface} from "./abstractInterface";
 
-export class MealInterface {
-  constructor(private service: MealService) {}
-
-  list() {
-    return this.service.list()
+export class MealInterface extends AbstractInterface<IMealModel, IMeal, MealCreateBody> {
+  constructor(service: MealService) {
+    super(service)
   }
 
-  create({name, ingredients}: Pick<IMeal, 'name'> & Partial<Pick<IMeal, 'ingredients'>>) {
-    return this.service.create({name, ingredients: ingredients ?? []})
+  async create({name, ingredients}: MealCreateBody) {
+    const emptyArray: IIngredientsWithQuantity[] = []
+    return this.service.create({name, ingredients: ingredients ?? emptyArray})
   }
 }

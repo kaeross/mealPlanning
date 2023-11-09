@@ -6,7 +6,9 @@
   },
   "type": "module",
   "dependencies": {
-    "elysia": "latest"
+    "elysia": "latest",
+    "neo4j-driver": "^5.13.0",
+    "neode": "^0.4.9"
   },
   "devDependencies": {
     "bun-types": "latest"

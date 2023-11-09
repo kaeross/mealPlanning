@@ -1,13 +1,9 @@
+import {Service} from "@domain/service";
 import {IngredientRepository} from "./repository";
-import {IIngredient} from "./types";
+import {IIngredientModel, IngredientCreateBody} from "./types";
 
-export class IngredientService {
-  constructor(private repository: IngredientRepository) {}
-  list() {
-    return this.repository.findMany()
-  }
-
-  create(ingredient: Omit<IIngredient, 'id'>) {
-    return this.repository.create(ingredient);
+export class IngredientService extends Service<IIngredientModel, IIngredientModel, IngredientCreateBody> {
+  constructor(repository: IngredientRepository) {
+    super(repository)
   }
 }
