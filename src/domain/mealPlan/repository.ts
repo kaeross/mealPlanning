@@ -3,15 +3,15 @@ import Neode from "neode";
 import {PlanModel} from "./model";
 import {Repository} from "@domain/repository";
 import {MealRepository} from "@domain/meal/repository";
-import {IPlan, IPlanModel, PlanCreateBody} from "./types";
+import {IPlan, IPlanModel, IPlanCreateBody} from "./types";
 import {CypherRecord} from "@domain/types";
 
-export class PlanRepository extends Repository<IPlanModel, IPlan, PlanCreateBody> {
+export class PlanRepository extends Repository<IPlanModel, IPlan, IPlanCreateBody> {
   constructor(db: Neode, private mealRepo: MealRepository) {
     super(db, 'Plan', PlanModel);
   }
 
-  async create({meals}: PlanCreateBody) {
+  async create({mealIds}: IPlanCreateBody) {
     const id = randomUUID();
     const toCreate = {id};
     const created = await this.model.create(toCreate);
@@ -25,8 +25,8 @@ export class PlanRepository extends Repository<IPlanModel, IPlan, PlanCreateBody
         throw new Error('Missing quantity relationship type')
       }
 
-    for(const meal of meals) {
-      const m = await this.mealRepo.find(meal.id);
+    for(const mealId of mealIds) {
+      const m = await this.mealRepo.find(mealId);
 
       await created.relateTo(m, 'includes', {consumedAt: null}, true)
     }} catch (e) {

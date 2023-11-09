@@ -30,6 +30,7 @@ const planInterface = new PlanInterface(planService)
 const app = new Elysia()
   .decorate('ingredientInterface', ingredientInterface)
   .decorate('mealInterface', mealInterface)
+  .decorate('planInterface', planInterface)
   .get("/", () => "Welcome to elysia")
   .get("/ingredients", async ({ingredientInterface, query}) => {
     const ids = query.ids ? JSON.parse(query.ids) : undefined;
@@ -66,6 +67,21 @@ const app = new Elysia()
         }),
         id: t.String() 
       }))
+    })
+  })
+  .get("/plans", async ({planInterface, query}) => {
+    const ids = query.ids ? JSON.parse(query.ids) : undefined;
+    return planInterface.list(ids)
+  }, {
+    query: t.Object({
+      ids: t.Optional(t.String())
+    })
+  })
+  .post("/plans",async ({planInterface, body}) => {
+    return planInterface.create(body)
+  }, {
+    body: t.Object({
+      mealIds: t.Array(t.String())
     })
   })
   .listen(3000)

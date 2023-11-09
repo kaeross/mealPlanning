@@ -1,6 +1,8 @@
 import {IMeal} from "@domain/meal/types";
 
-export type PlanCreateBody = Omit<IPlan, 'id'>
+export interface IPlanCreateBody {
+  mealIds: Array<string>
+} 
 
 export interface IPlannedMeal extends Partial<IMeal> {
   consumedAt: string | null
