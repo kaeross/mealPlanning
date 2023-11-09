@@ -1,11 +1,11 @@
-import {IIngredient} from "@domain/ingredient/types";
+import {IIngredientModel} from "@domain/ingredient/types";
 
 export interface IQuantity {
   value: number
   unit: string
 }
 
-export interface IIngredientsWithQuantity extends Partial<IIngredient> {
+export interface IIngredientsWithQuantity extends Partial<IIngredientModel> {
   id: string;
   quantity: IQuantity;
 }

@@ -17,5 +17,13 @@ export const MealModel: SchemaObject = {
       value: 'number',
       unit: 'string'
     }
+  },
+  includes: {
+    type: 'relationship',
+    relationship: 'INCLUDES',
+    direction: 'in',
+    properties: {
+      consumedAt: 'datetime'
+    }
   }
 }

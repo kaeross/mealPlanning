@@ -1,23 +1,23 @@
 import {randomUUID} from "crypto";
-import {IIngredient} from "./types";
-import Neode, {Model, RelationshipType} from "neode";
+import { IngredientCreateBody, IIngredientModel} from "./types";
+import Neode from "neode";
 import {QueryResult} from "neo4j-driver";
 import {IngredientModel} from "./model";
 import {Repository} from "@domain/repository";
 
-export class IngredientRepository extends Repository<IIngredient> {
+export class IngredientRepository extends Repository<IIngredientModel, IIngredientModel, IngredientCreateBody> {
   constructor(db: Neode) {
     super(db, 'Ingredient', IngredientModel);
   }
 
-  async create(ingredient: Omit<IIngredient, 'id'>) {
+  async create(ingredient: IngredientCreateBody) {
     const id = randomUUID();
     const toCreate = {...ingredient, id};
     const created = await this.model.create(toCreate)
     return created.properties();
   }
 
-  createMany(ingredients: Omit<IIngredient, 'id'>[]) {
+  createMany(ingredients: IngredientCreateBody[]) {
     return Promise.all(ingredients.map(this.create));
   }
 
@@ -41,7 +41,7 @@ export class IngredientRepository extends Repository<IIngredient> {
     return all.map(n => n.properties())
   }
 
-  formatRecords(records: QueryResult["records"]): IIngredient[] {
+  formatRecords(records: QueryResult["records"]): IIngredientModel[] {
     return records.map(record => record.map(r => r.properties)[0]);
   }
 }

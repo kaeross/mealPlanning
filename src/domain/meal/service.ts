@@ -1,13 +1,9 @@
+import {Service} from "@domain/service";
 import {MealRepository} from "./repository";
-import {MealCreateBody} from "./types";
+import {IMeal, IMealModel, MealCreateBody} from "./types";
 
-export class MealService {
-  constructor(private repository: MealRepository) {}
-  list(ids?: string[]) {
-    return this.repository.findMany(ids)
-  }
-
-  create(meal: MealCreateBody) {
-    return this.repository.create(meal);
+export class MealService extends Service<IMealModel, IMeal, MealCreateBody> {
+  constructor(repository: MealRepository) {
+    super(repository)
   }
 }

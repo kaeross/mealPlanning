@@ -4,17 +4,9 @@ import Neode from "neode";
 import {MealModel} from "./model";
 import {IngredientRepository} from "@domain/ingredient/repository";
 import {Repository} from "@domain/repository";
+import {CypherRecord} from "@domain/types";
 
-type CypherRecord = 
-  {
-      "keys": Array<string>,
-      "length": number,
-      "_fields": Array<unknown>,
-      // Used to get the index in the fields array of the key
-      "_fieldLookup": Record<string, number>
-  }
-
-export class MealRepository extends Repository<IMealModel> {
+export class MealRepository extends Repository<IMealModel, IMeal, MealCreateBody> {
   constructor(db: Neode, private ingredientRepo: IngredientRepository) {
     super(db, 'Meal', MealModel);
   }
@@ -36,7 +28,7 @@ export class MealRepository extends Repository<IMealModel> {
     for(const ingredient of ingredients) {
       const i = await this.ingredientRepo.find(ingredient.id);
 
-      created.relateTo(i, 'quantity', ingredient.quantity, true)
+      await created.relateTo(i, 'quantity', ingredient.quantity, true);
     }} catch (e) {
       console.error(e);
 
@@ -45,10 +37,20 @@ export class MealRepository extends Repository<IMealModel> {
 
     const createdMeal = created.properties();
     
-    return this.find(createdMeal.id);
+    const found = await this.findHydrated(createdMeal.id);
+
+    if(!found) {
+      throw new Error('Could not find created meal')
+    }
+
+    return found;
   }
 
-  async find(id: string) {
+  find(id: string) {
+    return this.model.find(id)
+  }
+
+  async findHydrated(id: string): Promise<IMeal | null> {
     const found = await this.db.cypher('MATCH (m:Meal {id: $id})-[q:HAS_QUANTITY]-(i:Ingredient) RETURN m.id, m.name, q.unit, q.value ,i.id, i.name', {id});
 
     if (!found.records) {
@@ -68,7 +70,7 @@ export class MealRepository extends Repository<IMealModel> {
     if (!ids?.length) {
       return this.findAll()
     }
-    return Promise.all(ids.map((id) => this.find(id)));
+    return Promise.all(ids.map((id) => this.findHydrated(id)));
   }
 
   formatFindResult(records: CypherRecord[]): IMeal {
