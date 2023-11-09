@@ -17,13 +17,6 @@ export class PlanRepository extends Repository<IPlanModel, IPlan, IPlanCreateBod
     const created = await this.model.create(toCreate);
 
     try {
-      const relationships = this.model.relationships();
-
-      const quantityRelationshipType = relationships.get("quantity")?.type()
-
-      if (!quantityRelationshipType) {
-        throw new Error('Missing quantity relationship type')
-      }
 
     for(const mealId of mealIds) {
       const m = await this.mealRepo.find(mealId);

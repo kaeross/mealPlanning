@@ -17,14 +17,6 @@ export class MealRepository extends Repository<IMealModel, IMeal, MealCreateBody
     const created = await this.model.create(toCreate);
 
     try {
-      const relationships = this.model.relationships();
-
-      const quantityRelationshipType = relationships.get("quantity")?.type()
-
-      if (!quantityRelationshipType) {
-        throw new Error('Missing quantity relationship type')
-      }
-
     for(const ingredient of ingredients) {
       const i = await this.ingredientRepo.find(ingredient.id);
 
