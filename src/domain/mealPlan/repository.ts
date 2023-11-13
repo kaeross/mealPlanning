@@ -17,15 +17,14 @@ export class PlanRepository extends Repository<IPlanModel, IPlan, IPlanCreateBod
     const created = await this.model.create(toCreate);
 
     try {
+      for(const mealId of mealIds) {
+        const m = await this.mealRepo.find(mealId);
 
-    for(const mealId of mealIds) {
-      const m = await this.mealRepo.find(mealId);
-
-      await created.relateTo(m, 'includes', {consumedAt: null}, true)
+        await created.relateTo(m, 'includes', {consumedAt: null}, true)
     }} catch (e) {
-      console.error(e);
+        console.error(e);
 
-      await created.delete()
+        await created.delete()
     }
 
     const createdMeal = created.properties();
