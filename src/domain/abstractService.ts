@@ -1,4 +1,4 @@
-import {Repository} from "./repository";
+import {Repository} from "./abstractRepository";
 
 export abstract class Service<TModel, TReturn, TCreate> {
   constructor(private repository: Repository<TModel, TReturn, TCreate>) {}

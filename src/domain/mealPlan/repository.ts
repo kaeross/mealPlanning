@@ -1,7 +1,7 @@
 import {randomUUID} from "crypto";
 import Neode from "neode";
 import {PlanModel} from "./model";
-import {Repository} from "@domain/repository";
+import {Repository} from "@domain/abstractRepository";
 import {MealRepository} from "@domain/meal/repository";
 import {IPlan, IPlanModel, IPlanCreateBody} from "./types";
 import {CypherRecord} from "@domain/types";

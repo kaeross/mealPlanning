@@ -1,4 +1,4 @@
-import {Service} from "@domain/service";
+import {Service} from "@domain/abstractService";
 
 export abstract class AbstractInterface<TModel, TReturn, TCreate> {
   constructor(protected service: Service<TModel, TReturn, TCreate>) {}

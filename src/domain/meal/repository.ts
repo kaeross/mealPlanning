@@ -3,7 +3,7 @@ import { IMeal, IMealModel, MealCreateBody} from "./types";
 import Neode from "neode";
 import {MealModel} from "./model";
 import {IngredientRepository} from "@domain/ingredient/repository";
-import {Repository} from "@domain/repository";
+import {Repository} from "@domain/abstractRepository";
 import {CypherRecord} from "@domain/types";
 
 export class MealRepository extends Repository<IMealModel, IMeal, MealCreateBody> {

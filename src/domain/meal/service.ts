@@ -1,4 +1,4 @@
-import {Service} from "@domain/service";
+import {Service} from "@domain/abstractService";
 import {MealRepository} from "./repository";
 import {IMeal, IMealModel, MealCreateBody} from "./types";
 

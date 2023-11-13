@@ -3,7 +3,7 @@ import { IngredientCreateBody, IIngredientModel} from "./types";
 import Neode from "neode";
 import {QueryResult} from "neo4j-driver";
 import {IngredientModel} from "./model";
-import {Repository} from "@domain/repository";
+import {Repository} from "@domain/abstractRepository";
 
 export class IngredientRepository extends Repository<IIngredientModel, IIngredientModel, IngredientCreateBody> {
   constructor(db: Neode) {

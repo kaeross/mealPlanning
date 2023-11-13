@@ -1,4 +1,4 @@
-import {Service} from "@domain/service";
+import {Service} from "@domain/abstractService";
 import {IngredientRepository} from "./repository";
 import {IIngredientModel, IngredientCreateBody} from "./types";
 

@@ -1,4 +1,4 @@
-import {Service} from "@domain/service";
+import {Service} from "@domain/abstractService";
 import {IPlan, IPlanModel, IPlanCreateBody} from "./types";
 import {PlanRepository} from "./repository";
 
