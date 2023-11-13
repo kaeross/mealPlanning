@@ -9,6 +9,7 @@ import {db} from "@infra/database"
 import {PlanRepository} from "@domain/mealPlan/repository";
 import {PlanService} from "@domain/mealPlan/service";
 import {PlanInterface} from "@interfaces/planInterface";
+import swagger from "@elysiajs/swagger";
 
 // Initialise dependencies
 
@@ -28,6 +29,19 @@ const planInterface = new PlanInterface(planService)
 // Create routes
 
 const app = new Elysia()
+  .use(swagger({
+    documentation: {
+      info: {
+        title: "Meal planning API docs",
+        version: "1.0.0"
+      },
+      tags: [
+        {name: "Ingredient", description: "Ingredient endpoints"},
+        {name: "Meal", description: "Meal endpoints"},
+        {name: "Plan", description: "Plan endpoints"},
+      ]
+    }
+  }))
   .decorate('ingredientInterface', ingredientInterface)
   .decorate('mealInterface', mealInterface)
   .decorate('planInterface', planInterface)
@@ -38,14 +52,20 @@ const app = new Elysia()
   }, {
     query: t.Object({
       ids: t.Optional(t.String())
-    })
+    }),
+    detail: {
+      tags: ['Ingredient']
+    }
   })
   .post("/ingredients", async ({ingredientInterface, body}) => {
     return ingredientInterface.create(body)
   }, {
     body: t.Object({
       name: t.String()
-    })
+    }),
+    detail: {
+      tags: ['Ingredient']
+    }
   })
   .get("/meals", async ({mealInterface, query}) => {
     const ids = query.ids ? JSON.parse(query.ids) : undefined;
@@ -53,7 +73,10 @@ const app = new Elysia()
   }, {
     query: t.Object({
       ids: t.Optional(t.String())
-    })
+    }),
+    detail: {
+      tags: ['Meal']
+    }
   })
   .post("/meals",async ({mealInterface, body}) => {
     return mealInterface.create(body)
@@ -67,7 +90,10 @@ const app = new Elysia()
         }),
         id: t.String() 
       }))
-    })
+    }),
+    detail: {
+      tags: ['Meal']
+    }
   })
   .get("/plans", async ({planInterface, query}) => {
     const ids = query.ids ? JSON.parse(query.ids) : undefined;
@@ -75,14 +101,20 @@ const app = new Elysia()
   }, {
     query: t.Object({
       ids: t.Optional(t.String())
-    })
+    }),
+    detail: {
+      tags: ['Plan']
+    }
   })
   .post("/plans",async ({planInterface, body}) => {
     return planInterface.create(body)
   }, {
     body: t.Object({
       mealIds: t.Array(t.String())
-    })
+    }),
+    detail: {
+      tags: ['Plan']
+    }
   })
   .listen(3000)
   .onStop(() => {
