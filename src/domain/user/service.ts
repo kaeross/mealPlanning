@@ -18,9 +18,9 @@ export class UserService {
   }
 
   async create({username, password}: IUserModel) {
-    const user = await this.repo.findUserByUsername(username);
+    const existingUser = await this.repo.findUserByUsername(username);
 
-    if (user) {
+    if (existingUser) {
       throw new Error('User already exists');
     }
 
